@@ -10,6 +10,10 @@ python3 -m http.server 8080
 
 Open http://localhost:8080. Use **Warp speed** to accelerate the starfield or the pause control to stop motion. The scene includes a rotating wireframe globe, orbital ship, radar sweeps, shooting stars, scroll reveals, and pointer-reactive project cards. System reduced-motion preferences are respected. Fonts load from Google Fonts with system fallbacks.
 
+## Time-based colors
+
+The visitor’s local clock selects solar gold from 6:00 AM until 6:00 PM and electric green overnight. The palette updates automatically while the page is open and when returning to the tab. It also applies to the animated planet, stars, ship, and warp effects, including when animations are paused. No location permission is needed. The dark space background remains in both modes.
+
 ## Optional static export
 
 ```sh

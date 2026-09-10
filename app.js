@@ -8,6 +8,17 @@
   const warpButton = document.getElementById('warp');
   const status = document.getElementById('flight-status');
   const media = matchMedia('(prefers-reduced-motion: reduce)');
+  let palette;
+  function readPalette() {
+    const css = getComputedStyle(document.documentElement);
+    const color = name => css.getPropertyValue(name).trim();
+    palette = {
+      rgb: color('--scene-rgb'), stars: color('--star-rgb'),
+      accent: `rgb(${color('--scene-rgb')})`, node: color('--node-color'),
+      glow: color('--scene-glow'), shade: color('--scene-shade'), clear: color('--scene-clear')
+    };
+  }
+  readPalette();
   let paused = media.matches, width = 0, height = 0, stars = [], meteors = [];
   let frame = null, last = 0, warpUntil = 0, time = 0, globeWidth = 0, globeHeight = 0;
   let nextMeteor = 1500, lastTelemetry = 0, scroll = 0;
@@ -38,13 +49,13 @@
       return { x: cx + (x * Math.cos(tilt) - y * Math.sin(tilt)) * radius, y: cy + (x * Math.sin(tilt) + y * Math.cos(tilt)) * radius, z };
     };
     const glow = g.createRadialGradient(cx - radius * .4, cy - radius * .4, 0, cx, cy, radius * 1.2);
-    glow.addColorStop(0, '#badc8730'); glow.addColorStop(.75, '#142e2030'); glow.addColorStop(1, '#142e2000');
+    glow.addColorStop(0, palette.glow); glow.addColorStop(.75, palette.shade); glow.addColorStop(1, palette.clear);
     g.fillStyle = glow; g.beginPath(); g.arc(cx, cy, radius * 1.2, 0, Math.PI * 2); g.fill();
     function line(points) {
       for (let n = 1; n < points.length; n++) {
         const a = points[n - 1], b = points[n];
         const alpha = (a.z + b.z) / 2;
-        g.strokeStyle = `rgba(185,242,131,${alpha > 0 ? .15 + alpha * .48 : .035})`;
+        g.strokeStyle = `rgba(${palette.rgb},${alpha > 0 ? .15 + alpha * .48 : .035})`;
         g.lineWidth = alpha > .8 ? .85 : .6;
         g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke();
       }
@@ -63,13 +74,13 @@
     for (const [lat, lon] of nodes) {
       const p = project(lat, lon);
       if (p.z < 0) continue;
-      g.fillStyle = '#d9ffad'; g.shadowBlur = 12; g.shadowColor = '#c2f970';
+      g.fillStyle = palette.node; g.shadowBlur = 12; g.shadowColor = palette.accent;
       g.beginPath(); g.arc(p.x, p.y, 2.5, 0, Math.PI * 2); g.fill(); g.shadowBlur = 0;
       const pulse = ((time * .00045 + lon) % 1);
-      g.strokeStyle = `rgba(194,249,112,${(1 - pulse) * .6})`;
+      g.strokeStyle = `rgba(${palette.rgb},${(1 - pulse) * .6})`;
       g.beginPath(); g.arc(p.x, p.y, 4 + pulse * 15, 0, Math.PI * 2); g.stroke();
     }
-    g.strokeStyle = '#c2f97060'; g.lineWidth = 1; g.beginPath(); g.arc(cx, cy, radius, 0, Math.PI * 2); g.stroke();
+    g.strokeStyle = `rgba(${palette.rgb},.38)`; g.lineWidth = 1; g.beginPath(); g.arc(cx, cy, radius, 0, Math.PI * 2); g.stroke();
   }
   function draw(delta) {
     if (!paused) time += delta;
@@ -88,11 +99,11 @@
         const x = cx + star.x * scale, y = cy + star.y * scale;
         if (x < -100 || x > width + 100 || y < -100 || y > height + 100) { Object.assign(star, seedStar()); star.z = 1400; continue; }
         const alpha = Math.min(.85, (1 - star.z / 1600) * (.7 + Math.sin(time * .001 + star.x) * .2));
-        ctx.fillStyle = `rgba(200,227,192,${alpha})`;
+        ctx.fillStyle = `rgba(${palette.stars},${alpha})`;
         const size = Math.min(2, star.size * scale);
         if (warping) {
           const trailScale = 650 / (previousZ + 90);
-          ctx.strokeStyle = `rgba(185,245,182,${alpha})`; ctx.lineWidth = size;
+          ctx.strokeStyle = `rgba(${palette.rgb},${alpha})`; ctx.lineWidth = size;
           ctx.beginPath(); ctx.moveTo(cx + star.x * trailScale, cy + star.y * trailScale); ctx.lineTo(x, y); ctx.stroke();
         } else { ctx.beginPath(); ctx.arc(x, y, size, 0, Math.PI * 2); ctx.fill(); }
       }
@@ -104,7 +115,7 @@
       for (const meteor of meteors) {
         if (!paused) { meteor.life += delta; meteor.x += delta * .65; meteor.y += delta * .28; }
         const gradient = ctx.createLinearGradient(meteor.x - 130, meteor.y - 56, meteor.x, meteor.y);
-        gradient.addColorStop(0, '#c2f97000'); gradient.addColorStop(1, `rgba(203,255,185,${Math.sin(meteor.life / 1100 * Math.PI) * .65})`);
+        gradient.addColorStop(0, `rgba(${palette.rgb},0)`); gradient.addColorStop(1, `rgba(${palette.rgb},${Math.sin(meteor.life / 1100 * Math.PI) * .65})`);
         ctx.strokeStyle = gradient; ctx.lineWidth = 1.2;
         ctx.beginPath(); ctx.moveTo(meteor.x - 130, meteor.y - 56); ctx.lineTo(meteor.x, meteor.y); ctx.stroke();
       }
@@ -177,5 +188,6 @@
     card.addEventListener('pointerleave', () => { card.style.transform = ''; });
     card.addEventListener('focusin', () => { card.classList.add('in-view'); });
   });
+  window.addEventListener('time-theme-change', () => { readPalette(); draw(0); });
   updateScroll(); resize(); syncMotion();
 })();
