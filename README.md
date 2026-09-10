@@ -14,6 +14,15 @@ Open http://localhost:8080. Use **Warp speed** to accelerate the starfield or th
 
 The visitor’s local clock selects solar gold from 6:00 AM until 6:00 PM and electric green overnight. The palette updates automatically while the page is open and when returning to the tab. It also applies to the animated planet, stars, ship, and warp effects, including when animations are paused. No location permission is needed. The dark space background remains in both modes.
 
+To preview either palette without changing your clock, open:
+
+- [Day preview](https://ricardoorellana.github.io/?theme=day)
+- [Night preview](https://ricardoorellana.github.io/?theme=night)
+
+The same query parameters work on localhost. A preview stays selected across reloads and tab switches. Remove `?theme=day` or `?theme=night` to return to automatic colors. Both palettes use a dark space background; the accent colors and animated scene change.
+
+Run the theme regression checks with `node --test tests/theme.test.cjs`.
+
 ## Optional static export
 
 ```sh
