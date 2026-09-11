@@ -1,0 +1,220 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json",
+  "basics": {
+    "name": "Ricardo Orellana",
+    "label": "Senior Software Engineer",
+    "image": "https://ricardoorellana.github.io/assets/og-image.png",
+    "url": "https://ricardoorellana.github.io/",
+    "summary": "I’m Ricardo, a software engineer in Guadalajara, Mexico. I turn complex problems into software that feels simple. Since 2015, I’ve built mobile apps, trading platforms, and the systems behind them. These days, I’m a Senior Software Engineer at Change.org. I like understanding the problem, working closely with people, and leaving the code a little easier to work with.",
+    "location": {
+      "city": "Guadalajara",
+      "region": "Jalisco",
+      "countryCode": "MX"
+    },
+    "profiles": [
+      {
+        "network": "LinkedIn",
+        "username": "rorellanam",
+        "url": "https://www.linkedin.com/in/rorellanam/"
+      },
+      {
+        "network": "GitHub",
+        "username": "ricardoorellana",
+        "url": "https://github.com/ricardoorellana"
+      }
+    ]
+  },
+  "work": [
+    {
+      "name": "Change.org",
+      "position": "Senior Software Engineer",
+      "url": "https://www.change.org/",
+      "startDate": "2025-10",
+      "summary": "I’m working on tools that help people speak up about the things they care about. At Change.org, that means helping turn a personal concern into a petition, a conversation, and a chance to make something happen.",
+      "highlights": [
+        "Full-time, remote",
+        "Focus: civic tech, web platform, product"
+      ]
+    },
+    {
+      "name": "ARCOS LLC",
+      "position": "Senior Software Engineer",
+      "location": "Guadalajara, Mexico",
+      "startDate": "2024-11",
+      "endDate": "2025-09",
+      "summary": "I worked across the frontend and backend of the ARCOS platform. A lot of the job was connecting the pieces: building features, keeping the application responsive, and making sure it could grow without getting harder to use.",
+      "highlights": [
+        "Full-time, hybrid",
+        "Focus: frontend, backend, performance, scalability"
+      ]
+    },
+    {
+      "name": "Bitso",
+      "position": "Software Engineer",
+      "startDate": "2021",
+      "endDate": "2024",
+      "summary": "I helped bring new features from an idea to a release, working with product, design, mobile, and backend teams. Along the way, I helped shape the tech stack and mentored React developers, sharing patterns that made everyday work easier.",
+      "highlights": [
+        "Helped establish the tech stack",
+        "Mentored React developers across teams",
+        "Cross-functional planning with product, design, mobile, and backend"
+      ]
+    },
+    {
+      "name": "EPAM Systems Mexico",
+      "position": "Senior Software Engineer",
+      "startDate": "2018",
+      "endDate": "2021",
+      "summary": "I built and maintained software across client projects, with a focus on code other engineers could understand and test. I also planned delivery, documented technical decisions, and helped teammates work through tricky implementation details.",
+      "highlights": [
+        "Testable software built on clean code and SOLID principles",
+        "Documented technical decisions and planned delivery",
+        "Unblocked engineers on implementation challenges across projects"
+      ]
+    },
+    {
+      "name": "Rever Inc.",
+      "position": "Lead Software Engineer",
+      "startDate": "2017",
+      "endDate": "2018",
+      "summary": "I led development across the frontend and backend, and introduced microservices as the platform grew. I also looked after development, staging, and production, adding automation, monitoring, and logging so we could see what was happening and keep things running.",
+      "highlights": [
+        "Led frontend and backend development",
+        "Extended the platform with microservices",
+        "Ran development, staging, and production environments with automation, monitoring, and logging"
+      ]
+    },
+    {
+      "name": "Propelics",
+      "position": "Front-End / Mobile Developer",
+      "startDate": "2015",
+      "endDate": "2017",
+      "summary": "This is where I got my start: building apps for iOS, Android, and mobile web with JavaScript and Appcelerator Titanium. Moving between platforms taught me to follow a bug carefully, pay attention to performance, and think about the person on the other side of the screen.",
+      "highlights": [
+        "Shipped for iOS, Android, and mobile web",
+        "Traced bugs and resolved cross-platform performance issues"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "Francisco Gavidia University",
+      "area": "Computer Science Engineering",
+      "studyType": "Bachelor of Science",
+      "startDate": "2008",
+      "endDate": "2014"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Interfaces",
+      "keywords": [
+        "JavaScript",
+        "React",
+        "Vue.js",
+        "HTML",
+        "CSS"
+      ]
+    },
+    {
+      "name": "Systems & data",
+      "keywords": [
+        "Python",
+        "Java",
+        "C++",
+        "MySQL",
+        "MongoDB",
+        "AWS"
+      ]
+    },
+    {
+      "name": "Testing & design principles",
+      "keywords": [
+        "TDD",
+        "Jest",
+        "React Testing Library",
+        "SOLID"
+      ]
+    },
+    {
+      "name": "Practice",
+      "keywords": [
+        "Microservices",
+        "Mentorship",
+        "Technical documentation",
+        "Delivery planning",
+        "Monitoring"
+      ]
+    }
+  ],
+  "languages": [
+    {
+      "language": "Spanish",
+      "fluency": "Native speaker"
+    },
+    {
+      "language": "English",
+      "fluency": "Professional working proficiency"
+    }
+  ],
+  "projects": [
+    {
+      "name": "Bitso Exchanger",
+      "description": "I contributed to a cryptocurrency exchange that helps people buy and sell digital assets. The goal: make a complicated financial product feel straightforward to use.",
+      "startDate": "2020",
+      "type": "application",
+      "keywords": [
+        "Fintech",
+        "Cryptocurrency",
+        "Exchange"
+      ]
+    },
+    {
+      "name": "Power E*TRADE",
+      "description": "A trading platform that brings stocks, options, and futures together. I contributed to a product where a clear interface matters when there’s a lot to keep track of.",
+      "startDate": "2018",
+      "type": "application",
+      "keywords": [
+        "Trading platform",
+        "Fintech"
+      ]
+    },
+    {
+      "name": "Continuous Improvement",
+      "description": "A web and mobile app that gives manufacturing employees a place to share ideas and improve the way they work. Practical tools for the people closest to the problem.",
+      "startDate": "2017",
+      "type": "application",
+      "keywords": [
+        "Enterprise",
+        "Web",
+        "Mobile"
+      ]
+    },
+    {
+      "name": "Apple Financial Services",
+      "description": "A mobile app for putting together quotes for Apple products. It brought an enterprise workflow onto a smaller screen, where clarity and ease of use matter even more.",
+      "startDate": "2016",
+      "type": "application",
+      "keywords": [
+        "Enterprise",
+        "Mobile"
+      ]
+    },
+    {
+      "name": "Audithere",
+      "description": "A mobile app for auditing items. One of my early projects, and a chance to turn a hands-on process into something people could carry in their pocket.",
+      "startDate": "2015",
+      "type": "application",
+      "keywords": [
+        "Mobile",
+        "Auditing"
+      ]
+    }
+  ],
+  "meta": {
+    "canonical": "https://ricardoorellana.github.io/resume.json",
+    "version": "v1.0.0",
+    "lastModified": "2026-09-11",
+    "note": "Project dates follow the project timeline and may differ from employment dates."
+  }
+}

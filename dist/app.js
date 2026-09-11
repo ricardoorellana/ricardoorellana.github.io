@@ -1,193 +1,277 @@
+/* A dependency-free Matrix portfolio. No commands leave the browser. */
 (() => {
   'use strict';
-  const canvas = document.getElementById('starfield');
-  const ctx = canvas.getContext('2d');
-  const globe = document.getElementById('planet-render');
-  const g = globe.getContext('2d');
-  const motionButton = document.getElementById('motion');
-  const warpButton = document.getElementById('warp');
-  const status = document.getElementById('flight-status');
-  const media = matchMedia('(prefers-reduced-motion: reduce)');
-  let palette;
-  function readPalette() {
-    const css = getComputedStyle(document.documentElement);
-    const color = name => css.getPropertyValue(name).trim();
-    palette = {
-      rgb: color('--scene-rgb'), stars: color('--star-rgb'),
-      accent: `rgb(${color('--scene-rgb')})`, node: color('--node-color'),
-      glow: color('--scene-glow'), shade: color('--scene-shade'), clear: color('--scene-clear')
-    };
+  const $ = s => document.querySelector(s);
+  const $$ = s => [...document.querySelectorAll(s)];
+  const root = document.documentElement;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  let paused = reduced.matches, frame = 0, lastFrame = 0, time = 0, boostedUntil = 0;
+  let toastTimer, clockTimer;
+  const motion = $('#motion');
+  const boost = $('#matrix-mode');
+  const glyphs = 'アイウエオカキクケコサシスセソタチツテトナニヌネノ012345789<>/{}';
+  const scenes = [];
+  let portraitVisible = true;
+
+  function notify(message) {
+    const toast = $('#toast');
+    clearTimeout(toastTimer);
+    toast.textContent = message;
+    toast.classList.add('visible');
+    toastTimer = setTimeout(() => toast.classList.remove('visible'), 4000);
   }
-  readPalette();
-  let paused = media.matches, width = 0, height = 0, stars = [], meteors = [];
-  let frame = null, last = 0, warpUntil = 0, time = 0, globeWidth = 0, globeHeight = 0;
-  let nextMeteor = 1500, lastTelemetry = 0, scroll = 0;
-  const pointer = { x: 0, y: 0 }, smoothPointer = { x: 0, y: 0 };
-  function seedStar() { return { x: (Math.random() - .5) * width * 2, y: (Math.random() - .5) * height * 2, z: Math.random() * 1400 + 1, size: .5 + Math.random() * 1.3 }; }
-  function resize() {
-    width = innerWidth; height = innerHeight;
-    const dpr = Math.min(devicePixelRatio || 1, 2);
-    canvas.width = width * dpr; canvas.height = height * dpr;
-    if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    globeWidth = globe.clientWidth; globeHeight = globe.clientHeight;
-    globe.width = globeWidth * dpr; globe.height = globeHeight * dpr;
-    if (g) g.setTransform(dpr, 0, 0, dpr, 0, 0);
-    stars = Array.from({ length: Math.min(480, Math.floor(width * height / 2200)) }, seedStar);
-    draw(0);
+
+  // Both canvases share one capped loop. The hidden tab and pause control stop it.
+  function createScene(canvas, portrait) {
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+    return { canvas, ctx, portrait, width: 0, height: 0, columns: [], mask: null };
   }
-  function drawPlanet() {
-    if (!g) return;
-    g.clearRect(0, 0, globeWidth, globeHeight);
-    const radius = Math.min(globeWidth * .3, 146);
-    const cx = globeWidth / 2, cy = globeHeight * .49;
-    const rotation = time * .00017 + smoothPointer.x * .45 + scroll * .0002;
-    const tilt = -.3 + smoothPointer.y * .2;
-    const project = (lat, lon) => {
-      const x = Math.cos(lat) * Math.sin(lon + rotation);
-      const y = Math.sin(lat);
-      const z = Math.cos(lat) * Math.cos(lon + rotation);
-      return { x: cx + (x * Math.cos(tilt) - y * Math.sin(tilt)) * radius, y: cy + (x * Math.sin(tilt) + y * Math.cos(tilt)) * radius, z };
-    };
-    const glow = g.createRadialGradient(cx - radius * .4, cy - radius * .4, 0, cx, cy, radius * 1.2);
-    glow.addColorStop(0, palette.glow); glow.addColorStop(.75, palette.shade); glow.addColorStop(1, palette.clear);
-    g.fillStyle = glow; g.beginPath(); g.arc(cx, cy, radius * 1.2, 0, Math.PI * 2); g.fill();
-    function line(points) {
-      for (let n = 1; n < points.length; n++) {
-        const a = points[n - 1], b = points[n];
-        const alpha = (a.z + b.z) / 2;
-        g.strokeStyle = `rgba(${palette.rgb},${alpha > 0 ? .15 + alpha * .48 : .035})`;
-        g.lineWidth = alpha > .8 ? .85 : .6;
-        g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke();
-      }
-    }
-    for (let lat = -80; lat <= 80; lat += 10) {
-      const points = [];
-      for (let lon = 0; lon <= 360; lon += 5) points.push(project(lat * Math.PI / 180, lon * Math.PI / 180));
-      line(points);
-    }
-    for (let lon = 0; lon < 360; lon += 15) {
-      const points = [];
-      for (let lat = -90; lat <= 90; lat += 5) points.push(project(lat * Math.PI / 180, lon * Math.PI / 180));
-      line(points);
-    }
-    const nodes = [[.5, .3],[-.4,1.8],[.1,3.3],[.8,4.4],[-.7,5.5]];
-    for (const [lat, lon] of nodes) {
-      const p = project(lat, lon);
-      if (p.z < 0) continue;
-      g.fillStyle = palette.node; g.shadowBlur = 12; g.shadowColor = palette.accent;
-      g.beginPath(); g.arc(p.x, p.y, 2.5, 0, Math.PI * 2); g.fill(); g.shadowBlur = 0;
-      const pulse = ((time * .00045 + lon) % 1);
-      g.strokeStyle = `rgba(${palette.rgb},${(1 - pulse) * .6})`;
-      g.beginPath(); g.arc(p.x, p.y, 4 + pulse * 15, 0, Math.PI * 2); g.stroke();
-    }
-    g.strokeStyle = `rgba(${palette.rgb},.38)`; g.lineWidth = 1; g.beginPath(); g.arc(cx, cy, radius, 0, Math.PI * 2); g.stroke();
+  for (const [selector, portrait] of [['#matrix-background', false], ['#matrix-portrait', true]]) {
+    const scene = createScene($(selector), portrait);
+    if (scene) scenes.push(scene);
   }
-  function draw(delta) {
-    if (!paused) time += delta;
-    smoothPointer.x += (pointer.x - smoothPointer.x) * .04;
-    smoothPointer.y += (pointer.y - smoothPointer.y) * .04;
-    const warping = performance.now() < warpUntil && !paused;
-    if (ctx) {
-      ctx.clearRect(0, 0, width, height);
-      const cx = width / 2 + (paused ? 0 : smoothPointer.x * 100);
-      const cy = height / 2 + (paused ? 0 : smoothPointer.y * 70);
-      for (const star of stars) {
-        const previousZ = star.z;
-        if (!paused) star.z -= delta * (warping ? 3.8 : .065);
-        if (star.z <= 8) { Object.assign(star, seedStar()); star.z = 1400; continue; }
-        const scale = 650 / star.z;
-        const x = cx + star.x * scale, y = cy + star.y * scale;
-        if (x < -100 || x > width + 100 || y < -100 || y > height + 100) { Object.assign(star, seedStar()); star.z = 1400; continue; }
-        const alpha = Math.min(.85, (1 - star.z / 1600) * (.7 + Math.sin(time * .001 + star.x) * .2));
-        ctx.fillStyle = `rgba(${palette.stars},${alpha})`;
-        const size = Math.min(2, star.size * scale);
-        if (warping) {
-          const trailScale = 650 / (previousZ + 90);
-          ctx.strokeStyle = `rgba(${palette.rgb},${alpha})`; ctx.lineWidth = size;
-          ctx.beginPath(); ctx.moveTo(cx + star.x * trailScale, cy + star.y * trailScale); ctx.lineTo(x, y); ctx.stroke();
-        } else { ctx.beginPath(); ctx.arc(x, y, size, 0, Math.PI * 2); ctx.fill(); }
+  function resizeScenes() {
+    const dpr = Math.min(devicePixelRatio || 1, 1.5);
+    for (const scene of scenes) {
+      const { canvas, ctx, portrait } = scene;
+      scene.width = canvas.clientWidth;
+      scene.height = canvas.clientHeight;
+      if (!scene.width || !scene.height) continue;
+      canvas.width = Math.round(scene.width * dpr);
+      canvas.height = Math.round(scene.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      scene.cell = portrait ? 10 : 24;
+      const rows = Math.ceil(scene.height / scene.cell);
+      scene.columns = Array.from({ length: Math.ceil(scene.width / scene.cell) }, (_, i) => ({
+        y: Math.random() * (rows + 24), speed: .015 + Math.random() * .025,
+        length: 8 + Math.random() * 20, seed: i * 31 + Math.floor(Math.random() * 999)
+      }));
+      if (portrait) {
+        const mask = document.createElement('canvas');
+        mask.width = Math.ceil(scene.width); mask.height = Math.ceil(scene.height);
+        const m = mask.getContext('2d', { willReadFrequently: true });
+        m.fillStyle = '#fff';
+        m.textAlign = 'center'; m.textBaseline = 'middle';
+        m.font = `900 ${Math.min(scene.width * .57, scene.height * .84)}px Arial`;
+        m.fillText('RO', scene.width / 2, scene.height * .47);
+        scene.mask = m.getImageData(0, 0, mask.width, mask.height);
+        $('.code-portrait').classList.add('canvas-ready');
       }
-      if (!paused && time > nextMeteor) {
-        meteors.push({ x: Math.random() * width, y: Math.random() * height * .4, life: 0 });
-        nextMeteor = time + 2600 + Math.random() * 2500;
-      }
-      meteors = meteors.filter(m => m.life < 1100);
-      for (const meteor of meteors) {
-        if (!paused) { meteor.life += delta; meteor.x += delta * .65; meteor.y += delta * .28; }
-        const gradient = ctx.createLinearGradient(meteor.x - 130, meteor.y - 56, meteor.x, meteor.y);
-        gradient.addColorStop(0, `rgba(${palette.rgb},0)`); gradient.addColorStop(1, `rgba(${palette.rgb},${Math.sin(meteor.life / 1100 * Math.PI) * .65})`);
-        ctx.strokeStyle = gradient; ctx.lineWidth = 1.2;
-        ctx.beginPath(); ctx.moveTo(meteor.x - 130, meteor.y - 56); ctx.lineTo(meteor.x, meteor.y); ctx.stroke();
-      }
+      drawScene(scene, 0);
     }
-    drawPlanet();
-    if (time - lastTelemetry > 160) {
-      document.getElementById('velocity').textContent = warping ? (80 + Math.sin(time * .004) * 19).toFixed(2) : (7.82 + Math.sin(time * .001) * .14).toFixed(2);
-      document.getElementById('sector').textContent = String(1 + Math.floor(time / 10000)).padStart(3, '0');
-      lastTelemetry = time;
-    }
+  }
+  function drawScene(scene, dt) {
+    const { ctx, width, height, cell, columns, portrait, mask } = scene;
+    ctx.clearRect(0, 0, width, height);
+    ctx.font = `${portrait ? 9 : 13}px monospace`;
+    ctx.textAlign = 'center';
+    const rows = Math.ceil(height / cell);
+    const boosted = boostedUntil > time;
+    columns.forEach((column, x) => {
+      column.y = (column.y + dt * column.speed * (boosted ? 3 : 1)) % (rows + column.length);
+      for (let y = 0; y < rows; y++) {
+        const distance = (column.y - y + rows + column.length) % (rows + column.length);
+        const tail = distance < column.length ? 1 - distance / column.length : 0;
+        const px = x * cell + cell / 2, py = y * cell + cell / 2;
+        const inside = portrait && mask && mask.data[(Math.min(Math.floor(py), mask.height - 1) * mask.width + Math.min(Math.floor(px), mask.width - 1)) * 4 + 3] > 100;
+        if (!inside && tail < .08 && !portrait) continue;
+        const noise = Math.sin(x * 17 + y * 11 + time * .0013) * .12;
+        const alpha = inside ? .45 + tail * .48 + noise : tail * (portrait ? .27 : .55);
+        if (alpha < .025) continue;
+        const lead = tail > .96;
+        ctx.fillStyle = lead || (inside && tail > .7) ? `rgba(187,255,208,${Math.min(alpha, 1)})` : `rgba(87,237,131,${Math.min(alpha, 1)})`;
+        const index = Math.abs((column.seed + y * 13 + Math.floor(time / (inside ? 280 : 160))) % glyphs.length);
+        ctx.fillText(glyphs[index], px, py + cell * .4);
+      }
+    });
   }
   function tick(now) {
-    frame = null; draw(Math.min(now - (last || now), 40)); last = now;
-    if (warpUntil && now >= warpUntil) {
-      warpUntil = 0; status.textContent = 'FLIGHT MODE: CRUISE'; warpButton.disabled = false; document.body.classList.remove('warp-active');
+    frame = requestAnimationFrame(tick);
+    if (now - lastFrame < 1000 / 24) return;
+    const dt = lastFrame ? Math.min(now - lastFrame, 80) : 0;
+    lastFrame = now;
+    time += dt;
+    for (const scene of scenes) if (!scene.portrait || portraitVisible) drawScene(scene, dt);
+    if (boostedUntil && time >= boostedUntil) {
+      boostedUntil = 0;
+      document.body.classList.remove('matrix-active');
+      boost.textContent = 'Enter the Matrix ↗';
     }
-    if (!paused && !document.hidden) frame = requestAnimationFrame(tick);
   }
   function syncMotion() {
-    document.body.classList.toggle('paused', paused); document.body.classList.remove('warp-active');
-    motionButton.setAttribute('aria-pressed', String(paused));
-    motionButton.setAttribute('aria-label', paused ? 'Resume animations' : 'Pause animations');
-    motionButton.textContent = paused ? '▷' : 'Ⅱ'; warpButton.disabled = paused;
-    status.textContent = paused ? 'FLIGHT MODE: PAUSED' : 'FLIGHT MODE: CRUISE';
-    if (frame !== null) cancelAnimationFrame(frame);
-    frame = null; last = 0; warpUntil = 0;
-    if (paused) { pointer.x = 0; pointer.y = 0; smoothPointer.x = 0; smoothPointer.y = 0; }
-    draw(0);
-    if (!paused && !document.hidden) frame = requestAnimationFrame(tick);
+    cancelAnimationFrame(frame); frame = 0; lastFrame = 0;
+    root.dataset.motion = paused ? 'paused' : 'running';
+    motion.setAttribute('aria-pressed', String(paused));
+    motion.setAttribute('aria-label', paused ? 'Resume animations' : 'Pause animations');
+    $('.motion-label').textContent = paused ? 'Motion off' : 'Motion on';
+    $('.motion-icon').textContent = paused ? '▷' : 'Ⅱ';
+    boost.disabled = paused;
+    if (paused) {
+      boostedUntil = 0; document.body.classList.remove('matrix-active');
+      boost.textContent = 'Enter the Matrix ↗';
+    }
+    if (!paused && !document.hidden && scenes.length) frame = requestAnimationFrame(tick);
   }
-  motionButton.addEventListener('click', () => { paused = !paused; syncMotion(); });
-  media.addEventListener('change', event => { paused = event.matches; syncMotion(); });
-  warpButton.addEventListener('click', () => {
-    if (paused) return;
-    warpUntil = performance.now() + 3200; warpButton.disabled = true;
-    status.textContent = 'FLIGHT MODE: HYPERSPACE'; document.body.classList.add('warp-active');
+  motion.hidden = false;
+  boost.hidden = false;
+  motion.addEventListener('click', () => { paused = !paused; syncMotion(); });
+  reduced.addEventListener('change', e => { paused = e.matches; syncMotion(); });
+  function enterMatrix() {
+    if (paused) { notify('Animations are paused. Use the motion control to play.'); return; }
+    boostedUntil = time + 5000;
+    document.body.classList.add('matrix-active');
+    boost.textContent = 'You’re in. ↗';
+    notify('There is no spoon. Just a little JavaScript.');
+  }
+  boost.addEventListener('click', enterMatrix);
+  new ResizeObserver(resizeScenes).observe($('.matrix-panel'));
+  window.addEventListener('resize', resizeScenes, { passive: true });
+  new IntersectionObserver(entries => { portraitVisible = entries[0].isIntersecting; }).observe($('.matrix-panel'));
+  resizeScenes();
+  syncMotion();
+
+  // Navigation stays usable without JavaScript; mobile enhancement is optional.
+  const menu = $('#menu-toggle'), nav = $('#main-nav');
+  menu.hidden = false;
+  function closeMenu() {
+    menu.setAttribute('aria-expanded', 'false');
+    menu.setAttribute('aria-label', 'Open navigation');
+    nav.classList.remove('is-open');
+  }
+  menu.addEventListener('click', () => {
+    const open = menu.getAttribute('aria-expanded') !== 'true';
+    menu.setAttribute('aria-expanded', String(open));
+    menu.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+    nav.classList.toggle('is-open', open);
   });
-  window.addEventListener('pointermove', event => { if (!paused) { pointer.x = event.clientX / width - .5; pointer.y = event.clientY / height - .5; } }, { passive: true });
-  window.addEventListener('resize', resize, { passive: true });
-  const progress = document.querySelector('.mission-progress');
-  function updateScroll() { scroll = scrollY; const total = document.documentElement.scrollHeight - innerHeight; progress.style.transform = `scaleX(${total > 0 ? scroll / total : 0})`; }
-  window.addEventListener('scroll', updateScroll, { passive: true });
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) { if (frame !== null) cancelAnimationFrame(frame); frame = null; }
-    else { last = 0; if (!paused && frame === null) frame = requestAnimationFrame(tick); }
+  nav.addEventListener('click', e => { if (e.target.closest('a')) closeMenu(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && nav.classList.contains('is-open')) { closeMenu(); menu.focus(); } });
+  document.addEventListener('keydown', e => {
+    if (e.defaultPrevented || e.isComposing || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
+    if (e.key !== 'j' && e.key !== 'k') return;
+    const target = e.target;
+    if (target.isContentEditable || target.closest('input, textarea, select, [role="textbox"]')) return;
+    if (nav.classList.contains('is-open')) return;
+    e.preventDefault();
+    window.scrollBy({ top: e.key === 'j' ? 100 : -100, behavior: paused || e.repeat ? 'instant' : 'smooth' });
   });
-  document.getElementById('year').textContent = new Date().getFullYear();
-  const links = [...document.querySelectorAll('nav a')];
-  if ('IntersectionObserver' in window) {
-    const observer = new IntersectionObserver(entries => {
-      for (const entry of entries) if (entry.isIntersecting) {
-        links.forEach(link => { const active = link.hash === '#' + entry.target.id; link.classList.toggle('active', active); if (active) link.setAttribute('aria-current', 'location'); else link.removeAttribute('aria-current'); });
-      }
-    }, { rootMargin: '-15% 0px -55% 0px', threshold: 0 });
-    document.querySelectorAll('main section[id]').forEach(section => observer.observe(section));
-    const reveal = new IntersectionObserver(entries => {
-      for (const entry of entries) if (entry.isIntersecting) { entry.target.classList.add('in-view'); reveal.unobserve(entry.target); }
-    }, { threshold: .08 });
-    document.querySelectorAll('.section-heading,.about-grid,.job,.project,.toolkit-grid,.education,.contact h2').forEach((element, index) => {
-      element.classList.add('reveal-ready'); element.style.transitionDelay = `${index % 3 * 70}ms`; reveal.observe(element);
+  document.addEventListener('click', e => { if (!e.target.closest('.header')) closeMenu(); });
+  matchMedia('(max-width: 680px)').addEventListener('change', closeMenu);
+  let scrollQueued = false;
+  const sections = $$('main section[id]');
+  function updateScroll() {
+    scrollQueued = false;
+    const max = document.documentElement.scrollHeight - innerHeight;
+    $('.scroll-progress i').style.transform = `scaleX(${max > 0 ? scrollY / max : 0})`;
+    let active = 'home';
+    for (const section of sections) if (section.getBoundingClientRect().top <= 160) active = section.id;
+    $$('#main-nav a').forEach(a => {
+      if (a.hash === '#' + active) a.setAttribute('aria-current', 'location');
+      else a.removeAttribute('aria-current');
     });
   }
-  document.querySelectorAll('.project').forEach(card => {
-    card.addEventListener('pointermove', event => {
-      if (paused || event.pointerType !== 'mouse') return;
-      const rect = card.getBoundingClientRect();
-      const x = (event.clientX - rect.left) / rect.width - .5, y = (event.clientY - rect.top) / rect.height - .5;
-      card.style.transform = `perspective(900px) rotateX(${-y * 7}deg) rotateY(${x * 7}deg)`;
+  window.addEventListener('scroll', () => { if (!scrollQueued) { scrollQueued = true; requestAnimationFrame(updateScroll); } }, { passive: true });
+  updateScroll();
+  if (!paused) {
+    const reveal = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (entry.isIntersecting) { entry.target.classList.add('in-view'); reveal.unobserve(entry.target); }
+    }), { threshold: .07 });
+    $$('[data-reveal]').forEach(el => { el.classList.add('reveal-ready'); reveal.observe(el); });
+  }
+
+  // Project filters never affect the printable résumé.
+  $('.project-filters').hidden = false;
+  $$('[data-filter]').forEach(button => button.addEventListener('click', () => {
+    $$('[data-filter]').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
+    let count = 0;
+    $$('.project').forEach(project => {
+      project.hidden = button.dataset.filter !== 'all' && project.dataset.category !== button.dataset.filter;
+      if (!project.hidden) { count++; project.classList.add('in-view'); }
     });
-    card.addEventListener('pointerleave', () => { card.style.transform = ''; });
-    card.addEventListener('focusin', () => { card.classList.add('in-view'); });
+    $('#project-status').textContent = `Showing ${count} ${count === 1 ? 'project' : 'projects'}.`;
+    updateScroll();
+  }));
+  $$('[data-print]').forEach(button => { button.hidden = false; button.addEventListener('click', () => window.print()); });
+
+  // A small, real terminal: a strict command map, text-only output, no eval.
+  const output = $('#terminal-output'), input = $('#terminal-input');
+  const history = []; let historyIndex = 0;
+  $('#terminal-form').hidden = false;
+  function line(text, prompt = false) {
+    const el = document.createElement('div'); el.className = 'terminal-line';
+    el.textContent = (prompt ? '❯ ' : '') + text;
+    if (prompt) el.classList.add('accent');
+    output.append(el);
+    while (output.children.length > 60) output.firstElementChild.remove();
+    output.scrollTop = output.scrollHeight;
+  }
+  function go(id) {
+    const section = $('#' + id);
+    section.scrollIntoView({ behavior: paused ? 'instant' : 'smooth' });
+    const title = section.querySelector('h2');
+    title.setAttribute('tabindex', '-1'); title.focus({ preventScroll: true });
+    title.addEventListener('blur', () => title.removeAttribute('tabindex'), { once: true });
+  }
+  const commands = {
+    help: () => line('about · work · experience · skills · contact · resume · matrix · pause · play · clear'),
+    whoami: () => line('Ricardo Orellana. Senior Software Engineer at Change.org. Guadalajara, Mexico.'),
+    about: () => { line('A person, not just a stack.'); go('about'); },
+    work: () => { line('Opening selected work.'); go('projects'); },
+    experience: () => { line('Six teams. Building since 2015.'); go('experience'); },
+    skills: () => { line('Interfaces, systems, and the habits behind them.'); go('toolkit'); },
+    contact: () => { line('Let’s start a conversation.'); go('contact'); },
+    resume: () => { line('Opening the print-friendly résumé. Choose Save as PDF to download.'); window.print(); },
+    matrix: enterMatrix,
+    rabbit: () => {
+      line('Follow the white rabbit. You found the back door.');
+      line('Underneath the Matrix: HTML, CSS, JavaScript, and a curious human.');
+      enterMatrix();
+    },
+    pause: () => { paused = true; syncMotion(); line('Animations paused.'); },
+    play: () => { paused = false; syncMotion(); line('Animations playing.'); },
+    clear: () => output.replaceChildren()
+  };
+  $('#terminal-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const command = input.value.trim().toLowerCase();
+    if (!command) return;
+    history.push(command); if (history.length > 50) history.shift(); historyIndex = history.length;
+    line(command, true); input.value = '';
+    if (Object.hasOwn(commands, command)) commands[command]();
+    else line(`“${command}” isn’t a command. Try help.`);
   });
-  window.addEventListener('time-theme-change', () => { readPalette(); draw(0); });
-  updateScroll(); resize(); syncMotion();
+  input.addEventListener('keydown', e => {
+    if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+    e.preventDefault();
+    historyIndex = Math.max(0, Math.min(history.length, historyIndex + (e.key === 'ArrowUp' ? -1 : 1)));
+    input.value = history[historyIndex] || '';
+  });
+  const clock = new Intl.DateTimeFormat('en', { timeZone: 'America/Mexico_City', hour: '2-digit', minute: '2-digit', hour12: false });
+  function updateClock() {
+    clearTimeout(clockTimer);
+    $('#local-time').textContent = clock.format(new Date()) + ' CST';
+    $('#year').textContent = new Date().getFullYear();
+    if (!document.hidden) clockTimer = setTimeout(updateClock, 60000);
+  }
+  document.addEventListener('visibilitychange', () => { syncMotion(); updateClock(); });
+  updateClock();
+  root.dataset.enhanced = 'true';
+
+  // A one-time greeting waiting in the console, without probing for DevTools.
+  console.info(
+    '%c ro_ %c\nWAKE UP, DEVELOPER.\n%c' +
+    '\nYou looked under the hood. I like that.\n' +
+    'This whole world is HTML, CSS, and a little JavaScript.\n\n' +
+    '%cFollow the white rabbit.\n%c' +
+    'Type rabbit in the terminal on the page.\n\n' +
+    'Built by Ricardo Orellana. Say hello:\n' +
+    'https://github.com/ricardoorellana\n' +
+    'https://www.linkedin.com/in/rorellanam/',
+    'background:#050907;color:#74fba1;font:bold 48px monospace;padding:8px 16px;',
+    'color:#74fba1;font:bold 18px monospace;line-height:1.8;',
+    'color:#a0b1a5;font:12px monospace;line-height:1.8;',
+    'color:#74fba1;font:bold 13px monospace;line-height:1.8;',
+    'color:#a0b1a5;font:12px monospace;line-height:1.8;'
+  );
 })();

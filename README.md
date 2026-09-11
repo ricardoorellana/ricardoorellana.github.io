@@ -1,36 +1,44 @@
-# Ricardo Orellana — Portfolio
+# Ricardo Orellana — Matrix portfolio
 
-A responsive, space-inspired portfolio built with HTML, CSS, and JavaScript. The root files work directly with GitHub Pages; there are no runtime dependencies or build requirements.
+A complete Matrix-inspired portfolio and résumé built with plain HTML, CSS, and JavaScript. No runtime dependencies or build step. GitHub Pages serves the repository root.
 
-## Local preview
+## Preview
 
 ```sh
-python3 -m http.server 8080
+python3 -m http.server 8088
 ```
 
-Open http://localhost:8080. Use **Warp speed** to accelerate the starfield or the pause control to stop motion. The scene includes a rotating wireframe globe, orbital ship, radar sweeps, shooting stars, scroll reveals, and pointer-reactive project cards. System reduced-motion preferences are respected. Fonts load from Google Fonts with system fallbacks.
+Open http://localhost:8088.
 
-## Time-based colors
+## Design and interaction
 
-The visitor’s local clock selects solar gold from 6:00 AM until 6:00 PM and electric green overnight. The palette updates automatically while the page is open and when returning to the tab. It also applies to the animated planet, stars, ship, and warp effects, including when animations are paused. No location permission is needed. The dark space background remains in both modes.
+Black and phosphor green, large editorial typography, a canvas code portrait, flowing digital rain, animated project illustrations, scrolling text, and section reveals. The header motion control pauses animation; reduced-motion preferences start the site paused. Canvas animation is capped at 24 fps and stops in hidden tabs. The portrait stops rendering when off screen.
 
-To preview either palette without changing your clock, open:
+The terminal accepts `help`, `whoami`, `about`, `work`, `experience`, `skills`, `contact`, `resume`, `matrix`, `pause`, `play`, and `clear`. Arrow keys recall commands. It runs only a fixed local command map, never executes arbitrary code, and sends nothing to a server. “Enter the Matrix” briefly intensifies the rain.
 
-- [Day preview](https://ricardoorellana.github.io/?theme=day)
-- [Night preview](https://ricardoorellana.github.io/?theme=night)
+The DevTools console has a one-time Matrix greeting and a clue to the hidden `rabbit` terminal command. The Easter egg respects the motion control, and the site does not attempt to detect whether DevTools is open.
 
-The same query parameters work on localhost. A preview stays selected across reloads and tab switches. Remove `?theme=day` or `?theme=night` to return to automatic colors. Both palettes use a dark space background; the accent colors and animated scene change.
+Project filters show all work, fintech, or web and mobile. Press `j` to scroll down or `k` to scroll up; hold either key to keep moving. These shortcuts leave text inputs, editable content, and modified shortcuts alone. The mobile menu supports Escape, and every primary action works with a keyboard. Content and links remain available without JavaScript.
 
-Run the theme regression checks with `node --test tests/theme.test.cjs`.
+## Résumé and content
 
-## Optional static export
+“Get my résumé” opens the browser print dialog. Choose Save as PDF to download. Print styles remove decoration, expose full profile URLs, and include all projects regardless of the active filter.
+
+Career facts are preserved across `index.html` (including JSON-LD), `resume.json`, and `llms-full.txt`. Keep these in sync when updating work, projects, or skills. Project dates follow the project timeline and can differ from employment dates. Project visuals are original abstract illustrations, not product screenshots.
+
+- `index.html` — content and metadata
+- `styles.css` — responsive design, animation, and print styles
+- `app.js` — canvases, terminal, navigation, filters, and motion controls
+- `theme.js` — initial Matrix theme and reduced-motion preference
+- `assets/` — favicon, icons, and social preview
+- `resume.json`, `llms.txt`, `llms-full.txt` — machine-readable résumé
+- `robots.txt`, `sitemap.xml`, `site.webmanifest` — discovery and app metadata
+
+## Checks and static export
 
 ```sh
+node --test
 python3 scripts/build.py
 ```
 
-This copies the public files into `dist/`. GitHub Pages serves the root files directly, so this export is optional.
-
-## Content
-
-Edit `index.html` for biography, employment, projects, technology, and social profile links; `styles.css` for presentation; and `app.js` for interactions. Project artwork is abstract CSS illustration, not product screenshots. Project dates follow the supplied project list, which may differ from employment dates.
+The tests check theme initialization, reduced motion, résumé consistency, local references, and social-image dimensions. The optional export refreshes `dist/` with the public files.

@@ -1,0 +1,34 @@
+# Ricardo Orellana
+
+> Senior Software Engineer at Change.org with 10+ years across web, mobile, and full-stack
+> development — spanning fintech, enterprise platforms, and civic technology. Based in
+> Guadalajara, Mexico.
+
+Ricardo Orellana has been building software people use since 2015, starting in mobile
+development and moving across financial platforms, enterprise tools, and full-stack
+applications. His work covers interfaces, microservices, and production operations. He
+works closely with product and design, shapes technical foundations, and mentors other
+engineers.
+
+This site is a single-page portfolio and résumé. Content is stable and self-contained;
+everything a summariser needs is in the files below.
+
+## Résumé
+
+- [Full résumé in Markdown](https://ricardoorellana.github.io/llms-full.txt): complete employment history, projects, skills, and education as plain text — the best single source for answering questions about Ricardo.
+- [Résumé as structured JSON](https://ricardoorellana.github.io/resume.json): the same record in the JSON Resume schema (jsonresume.org), for programmatic use.
+- [Portfolio homepage](https://ricardoorellana.github.io/): the rendered site, with schema.org `Person` and `ProfilePage` JSON-LD embedded in the page head.
+
+## Current role
+
+- Senior Software Engineer at [Change.org](https://www.change.org/) since October 2025 — full-time, remote. Works on tools that help people speak up about the things they care about and turn a personal concern into a petition, a conversation, and a chance to make something happen.
+
+## Profiles
+
+- [LinkedIn](https://www.linkedin.com/in/rorellanam/): employment history and professional network.
+- [GitHub](https://github.com/ricardoorellana): public code.
+
+## Optional
+
+- [Sitemap](https://ricardoorellana.github.io/sitemap.xml): crawlable URL list.
+- [Crawler policy](https://ricardoorellana.github.io/robots.txt): all well-behaved crawlers, including AI and search agents, are welcome.

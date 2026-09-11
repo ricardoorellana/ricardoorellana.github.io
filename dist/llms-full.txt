@@ -1,0 +1,91 @@
+# Ricardo Orellana — Senior Software Engineer
+
+- **Location:** Guadalajara, Jalisco, Mexico
+- **Current role:** Senior Software Engineer at Change.org (since October 2025)
+- **Experience:** Building since 2015, across 6 engineering teams
+- **Focus:** Web, mobile, and full-stack development
+- **Website:** https://ricardoorellana.github.io/
+- **LinkedIn:** https://www.linkedin.com/in/rorellanam/
+- **GitHub:** https://github.com/ricardoorellana
+
+## Summary
+
+I’m Ricardo, a software engineer in Guadalajara, Mexico. I turn complex problems into software that feels simple. Since 2015, I’ve built mobile apps, trading platforms, and the systems behind them. These days, I’m a Senior Software Engineer at Change.org. I like understanding the problem, working closely with people, and leaving the code a little easier to work with.
+
+## Experience
+
+### Senior Software Engineer — Change.org
+**2025-10 – Present**
+
+I’m working on tools that help people speak up about the things they care about. At Change.org, that means helping turn a personal concern into a petition, a conversation, and a chance to make something happen.
+
+### Senior Software Engineer — ARCOS LLC
+**2024-11 – 2025-09**
+
+I worked across the frontend and backend of the ARCOS platform. A lot of the job was connecting the pieces: building features, keeping the application responsive, and making sure it could grow without getting harder to use.
+
+### Software Engineer — Bitso
+**2021 – 2024**
+
+I helped bring new features from an idea to a release, working with product, design, mobile, and backend teams. Along the way, I helped shape the tech stack and mentored React developers, sharing patterns that made everyday work easier.
+
+### Senior Software Engineer — EPAM Systems Mexico
+**2018 – 2021**
+
+I built and maintained software across client projects, with a focus on code other engineers could understand and test. I also planned delivery, documented technical decisions, and helped teammates work through tricky implementation details.
+
+### Lead Software Engineer — Rever Inc.
+**2017 – 2018**
+
+I led development across the frontend and backend, and introduced microservices as the platform grew. I also looked after development, staging, and production, adding automation, monitoring, and logging so we could see what was happening and keep things running.
+
+### Front-End / Mobile Developer — Propelics
+**2015 – 2017**
+
+This is where I got my start: building apps for iOS, Android, and mobile web with JavaScript and Appcelerator Titanium. Moving between platforms taught me to follow a bug carefully, pay attention to performance, and think about the person on the other side of the screen.
+
+## Selected work
+
+These are team projects I contributed to. Dates follow the project timeline and may differ from employment dates. The illustrations on the site are original interpretations, not product screenshots.
+
+### Bitso Exchanger (2020)
+
+I contributed to a cryptocurrency exchange that helps people buy and sell digital assets. The goal: make a complicated financial product feel straightforward to use.
+
+### Power E*TRADE (2018)
+
+A trading platform that brings stocks, options, and futures together. I contributed to a product where a clear interface matters when there’s a lot to keep track of.
+
+### Continuous Improvement (2017)
+
+A web and mobile app that gives manufacturing employees a place to share ideas and improve the way they work. Practical tools for the people closest to the problem.
+
+### Apple Financial Services (2016)
+
+A mobile app for putting together quotes for Apple products. It brought an enterprise workflow onto a smaller screen, where clarity and ease of use matter even more.
+
+### Audithere (2015)
+
+A mobile app for auditing items. One of my early projects, and a chance to turn a hands-on process into something people could carry in their pocket.
+
+## Skills
+
+- **Interfaces:** JavaScript, React, Vue.js, HTML, CSS
+- **Systems & data:** Python, Java, C++, MySQL, MongoDB, AWS
+- **Testing & design principles:** TDD, Jest, React Testing Library, SOLID
+- **Practice:** Microservices, Mentorship, Technical documentation, Delivery planning, Monitoring
+
+## Education
+
+**B.S. in Computer Science Engineering** — Francisco Gavidia University, 2008 – 2014
+
+## Languages
+
+Spanish (native), English (professional working proficiency)
+
+## Contact
+
+Have an interesting problem, a project you care about, or just want to talk shop? I’d like to hear from you.
+
+LinkedIn is the best place to start a conversation: https://www.linkedin.com/in/rorellanam/
+You can also find what I’m tinkering with on GitHub: https://github.com/ricardoorellana
