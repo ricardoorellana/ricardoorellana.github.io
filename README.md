@@ -29,7 +29,6 @@ Career facts are preserved across `index.html` (including JSON-LD), `resume.json
 - `index.html` — content and metadata
 - `styles.css` — responsive design, animation, and print styles
 - `app.js` — canvases, terminal, navigation, filters, and motion controls
-- `theme.js` — initial Matrix theme and reduced-motion preference
 - `assets/` — favicon, icons, and social preview
 - `resume.json`, `llms.txt`, `llms-full.txt` — machine-readable résumé
 - `robots.txt`, `sitemap.xml`, `site.webmanifest` — discovery and app metadata
@@ -41,4 +40,4 @@ node --test
 python3 scripts/build.py
 ```
 
-The tests check theme initialization, reduced motion, résumé consistency, local references, and social-image dimensions. The optional export refreshes `dist/` with the public files.
+The tests check résumé consistency, local references, and social-image dimensions. Reduced motion is handled by the stylesheet before paint and by `app.js` for interactions. The optional export refreshes `dist/` with the public files.

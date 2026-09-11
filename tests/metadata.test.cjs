@@ -43,8 +43,8 @@ test('every employer on the page appears in all machine-readable copies', () => 
 });
 
 test('projects are listed consistently across the page and the data files', () => {
-  const onPage = [...html.matchAll(/<h3>([^<]+)<\/h3>\s*<p>[^<]*<\/p>\s*<\/article>|<div class="project-content">\s*<p class="project-category[^"]*">[^<]*<\/p>\s*<h3>([^<]+)</g)]
-    .map(m => (m[1] || m[2]).trim());
+  const onPage = [...html.matchAll(/<div class="project-content">\s*<p class="project-category[^"]*">[^<]*<\/p>\s*<h3>([^<]+)</g)]
+    .map(m => m[1].trim());
   const listed = graph.find(entry => entry['@id'] === `${SITE}/#projects`).itemListElement.map(e => e.item.name);
   assert.equal(listed.length, resume.projects.length);
   assert.deepEqual(listed, resume.projects.map(p => p.name));

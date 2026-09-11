@@ -11,7 +11,7 @@ OUT = ROOT / 'dist'
 
 # Everything a visitor, a crawler, or a language model can request.
 FILES = [
-    'index.html', 'styles.css', 'app.js', 'theme.js',
+    'index.html', 'styles.css', 'app.js',
     'robots.txt', 'sitemap.xml', 'llms.txt', 'llms-full.txt',
     'resume.json', 'site.webmanifest', '.nojekyll',
 ]
