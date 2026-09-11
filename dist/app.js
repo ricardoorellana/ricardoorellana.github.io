@@ -260,7 +260,7 @@
 
   // A one-time greeting waiting in the console, without probing for DevTools.
   console.info(
-    '%c ro_ %c\nWAKE UP, DEVELOPER.\n%c' +
+    '%c RO_ %c\nWAKE UP, DEVELOPER.\n%c' +
     '\nYou looked under the hood. I like that.\n' +
     'This whole world is HTML, CSS, and a little JavaScript.\n\n' +
     '%cFollow the white rabbit.\n%c' +
