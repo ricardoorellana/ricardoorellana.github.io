@@ -252,7 +252,7 @@
   .terminal-muted { color: var(--quiet); }
   .terminal-form { display: flex; align-items: center; gap: 10px; padding-left: 15px; border-top: 1px solid rgb(35 56 43 / .5); }
   .terminal-form label { color: var(--accent); }
-  .terminal-form input { flex: 1; width: 0; min-width: 0; height: 44px; color: var(--text); border: 0; background: none; border-radius: 0; caret-color: var(--accent); padding: 0; font-size: 11px; }
+  .terminal-form input { flex: 1; width: 0; min-width: 0; height: 48px; color: var(--text); border: 0; background: none; border-radius: 0; caret-color: var(--accent); padding: 12px; font-size: 11px; }
   .terminal-form input::placeholder { color: var(--quiet); opacity: 1; }
   .terminal-form input:focus-visible { outline-offset: 0; outline-width: 1px; }
   .terminal-form button { width: 44px; height: 44px; color: var(--accent); font-size: 19px; flex-shrink: 0; }
